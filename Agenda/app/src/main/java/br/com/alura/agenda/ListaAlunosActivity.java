@@ -1,6 +1,7 @@
 package br.com.alura.agenda;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -31,7 +32,19 @@ public class ListaAlunosActivity extends AppCompatActivity {
         listaAlunos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
                 public void onItemClick(AdapterView<?> lista, View item, int position, long id) {
+                    Aluno aluno = (Aluno)listaAlunos.getItemAtPosition(position);
+                    Intent intentVaiProFormulario = new Intent(ListaAlunosActivity.this, FormularioActivity.class);
+                    intentVaiProFormulario.putExtra("aluno", aluno);
+                    startActivity(intentVaiProFormulario);
 
+            }
+        });
+
+        listaAlunos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(ListaAlunosActivity.this, "Clique longo", Toast.LENGTH_SHORT).show();
+                return false;
             }
         });
 
@@ -63,12 +76,36 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, final ContextMenu.ContextMenuInfo menuInfo) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        final Aluno aluno = (Aluno) listaAlunos.getItemAtPosition(info.position);
+
+       MenuItem itemSMS = menu.add("Enviar SMS");
+       Intent intentSMS = new Intent(Intent.ACTION_VIEW);
+       intentSMS.setData(Uri.parse("sms:" + aluno.getTelefone()));
+        itemSMS.setIntent(intentSMS);
+
+        MenuItem itemMapa = menu.add("Visualizar no mapa");
+        Intent intentMapa = new Intent(Intent.ACTION_VIEW);
+        intentMapa.setData(Uri.parse("geo:0,0?q=" + aluno.getEndereco()));
+        //intentMapa.setData(Uri.parse("geo:0,0"));
+        itemMapa.setIntent(intentMapa);
+
+
+       MenuItem itemSite = menu.add("Visitar Site");
+       Intent intentSite = new Intent(Intent.ACTION_VIEW);
+       String site = aluno.getSite();
+       if(!site.startsWith("http://")){
+           site = "http://" + site;
+       }
+       intentSite.setData(Uri.parse(site));
+        itemSite.setIntent(intentSite);
+
+
         MenuItem deletar = menu.add("Deletar");
         deletar.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-                Aluno aluno = (Aluno) listaAlunos.getItemAtPosition(info.position);
+
                 AlunoDao dao = new AlunoDao(ListaAlunosActivity.this);
                 dao.deleta(aluno);
                 carregaLista();

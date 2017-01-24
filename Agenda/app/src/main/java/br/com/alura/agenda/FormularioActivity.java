@@ -27,7 +27,12 @@ public class FormularioActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_formulario);
 
+        Intent intent = getIntent();
+        Aluno aluno = (Aluno)intent.getSerializableExtra("aluno");
         helper = new FormularioHelper(this);
+        if(aluno != null){
+            helper.preencheFormulario(aluno);
+        }
 
         /*
         Button botaoSalvar = (Button) findViewById(R.id.formulario_salvar);
@@ -53,7 +58,13 @@ public class FormularioActivity extends AppCompatActivity {
             case R.id.menu_formulario_ok:
                 Aluno aluno = helper.pegaAluno();
                 AlunoDao dao = new AlunoDao(this);
-                dao.insere(aluno);
+                if(aluno.getId() == null){
+                    dao.insere(aluno);
+                }
+                else{
+                    dao.alteraAluno(aluno);
+                }
+
                 dao.close();
                 Toast.makeText(FormularioActivity.this, "Aluno " + aluno.getNome() + " salvo!", Toast.LENGTH_SHORT).show();
                 finish();
