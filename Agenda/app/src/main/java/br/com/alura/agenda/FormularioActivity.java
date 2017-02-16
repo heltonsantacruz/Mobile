@@ -22,7 +22,7 @@ import br.com.alura.agenda.modelo.Aluno;
 
 public class FormularioActivity extends AppCompatActivity {
 
-
+	//Teste
     public static final int CODIGO_CAMERA = 567;
     private FormularioHelper helper;
     private String caminhoFoto;
